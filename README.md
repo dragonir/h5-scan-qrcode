@@ -1,6 +1,6 @@
 # 前端实现H5浏览器扫码功能
 
-![banner](http://127.0.0.1:8080/images/banner.png)
+![banner](./images/banner.png)
 
 背景介绍、实现效果、技术简介、代码实现、总结等5部分组成
 
@@ -17,6 +17,13 @@
 扫码识别
 跳转进入申请页面
 
+![scan](./images/scan.gif)
+
+> 在线体验：https://dragonir.github.io/h5-scan-qrcode/#/
+
+![landscape](./images/landscape.png)
+
+横屏检测：[《五十音小游戏中的前端知识》](https://juejin.cn/post/6987393152332070920)
 
 ## 技术简介
 
@@ -88,7 +95,273 @@ if (code) {
 整个扫码流程如图所示：
 页面初始化，先检查浏览器是否支持mediaDevices相关API，浏览器进行调去摄像头，调用失败，就执行失败回调；调用成功，进行捕获视频流，然后进行扫码识别，没有扫瞄到可识别的二维码就继续扫描，扫码成功后绘制扫描成功图案并进行成功回调。
 
-![process](http://127.0.0.1:8080/images/process.png)
+![process](./images/process.png)
+
+### 页面结构
+
+企业云盘h5项目是vue技术栈，我们先看下页面结构
+
+* 提示框
+* 扫码框
+* video：展示摄像头捕获视频流
+* canvas: 绘制视频帧，用于二维码识别
+
+```html
+<template>
+  <div class="scaner" ref="scaner">
+    <div class="banner" v-if="showBanner">
+      <i class="close_icon" @click="() => showBanner = false"></i>
+      <p class="text">若当前浏览器无法扫码，请切换其他浏览器尝试</p>
+    </div>
+    <div class="cover">
+      <p class="line"></p>
+      <span class="square top left"></span>
+      <span class="square top right"></span>
+      <span class="square bottom right"></span>
+      <span class="square bottom left"></span>
+      <p class="tips">将二维码放入框内，即可自动扫描</p>
+    </div>
+    <video
+      v-show="showPlay"
+      class="source"
+      ref="video"
+      :width="videoWH.width"
+      :height="videoWH.height"
+      controls
+    ></video>
+    <canvas v-show="!showPlay" ref="canvas" />
+    <button v-show="showPlay" @click="run">开始</button>
+  </div>
+</template>
+```
+
+### 方法：绘制
+
+* 画线
+* 画框
+（用于扫码成功后绘制矩形图形
+
+![process_1](./images/process_1.png)
+
+```js
+// 画线
+    drawLine (begin, end) {
+      this.canvas.beginPath();
+      this.canvas.moveTo(begin.x, begin.y);
+      this.canvas.lineTo(end.x, end.y);
+      this.canvas.lineWidth = this.lineWidth;
+      this.canvas.strokeStyle = this.lineColor;
+      this.canvas.stroke();
+    },
+    // 画框
+    drawBox (location) {
+      if (this.drawOnfound) {
+        this.drawLine(location.topLeftCorner, location.topRightCorner);
+        this.drawLine(location.topRightCorner, location.bottomRightCorner);
+        this.drawLine(location.bottomRightCorner, location.bottomLeftCorner);
+        this.drawLine(location.bottomLeftCorner, location.topLeftCorner);
+      }
+    },
+```
+
+### 方法：初始化
+* 检查是否支持
+* 调起摄像头
+* 成功失败处理
+
+![process_2](./images/process_2.png)
+
+```js
+    // 初始化
+    setup () {
+      if (this.responsive) {
+        this.$nextTick(() => {
+          this.containerWidth = this.$refs.scaner.clientWidth;
+        });
+      }
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        this.previousCode = null;
+        this.parity = 0;
+        this.active = true;
+        this.canvas = this.$refs.canvas.getContext("2d");
+        const facingMode = this.useBackCamera ? { exact: 'environment' } : 'user';
+        const handleSuccess = stream => {
+           if (this.$refs.video.srcObject !== undefined) {
+            this.$refs.video.srcObject = stream;
+          } else if (window.videoEl.mozSrcObject !== undefined) {
+            this.$refs.video.mozSrcObject = stream;
+          } else if (window.URL.createObjectURL) {
+            this.$refs.video.src = window.URL.createObjectURL(stream);
+          } else if (window.webkitURL) {
+            this.$refs.video.src = window.webkitURL.createObjectURL(stream);
+          } else {
+            this.$refs.video.src = stream;
+          }
+          this.$refs.video.playsInline = true;
+          const playPromise = this.$refs.video.play();
+          playPromise.catch(() => (this.showPlay = true));
+          playPromise.then(this.run);
+        };
+        navigator.mediaDevices
+          .getUserMedia({ video: { facingMode } })
+          .then(handleSuccess)
+          .catch(() => {
+            navigator.mediaDevices
+              .getUserMedia({ video: true })
+              .then(handleSuccess)
+              .catch(error => {
+                this.$emit("error-captured", error);
+              });
+          });
+      }
+    },
+```
+
+### 方法：周期性扫描
+![process_3](./images/process_3.png)
+
+### 方法：成功回调
+![process_4](./images/process_4.png)
+
+### 方法：停止
+![process_5](./images/process_5.png)
+
+```js
+ run () {
+      if (this.active) {
+        requestAnimationFrame(this.tick);
+      }
+    },
+    found (code) {
+      if (this.previousCode !== code) {
+        this.previousCode = code;
+      } else if (this.previousCode === code) {
+        this.parity += 1;
+      }
+      if (this.parity > 2) {
+        this.active = this.stopOnScanned ? false : true;
+        this.parity = 0;
+        this.$emit("code-scanned", code);
+      }
+    },
+    // 完全停止
+    fullStop () {
+      if (this.$refs.video && this.$refs.video.srcObject) {
+        this.$refs.video.srcObject.getTracks().forEach(t => t.stop());
+      }
+    }
+```
+
+### 方法：扫描
+![process_6](./images/process_6.png)
+
+```js
+tick () {
+      if (this.$refs.video && this.$refs.video.readyState === this.$refs.video.HAVE_ENOUGH_DATA) {
+        this.$refs.canvas.height = this.videoWH.height;
+        this.$refs.canvas.width = this.videoWH.width;
+        this.canvas.drawImage(this.$refs.video, 0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
+        const imageData = this.canvas.getImageData(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
+        let code = false;
+        try {
+          code = jsQR(imageData.data, imageData.width, imageData.height);
+        } catch (e) {
+          console.error(e);
+        }
+        if (code) {
+          this.drawBox(code.location);
+          this.found(code.data);
+        }
+      }
+      this.run();
+    },
+```
+
+### 父组件页面
+
+```html
+<template>
+  <div class="scan">
+    <div class="nav">
+      <a class="close" @click="() => $router.go(-1)"></a>
+      <p class="title">Scan QRcode</p>
+    </div>
+    <div class="scroll-container">
+      <Scaner
+        v-on:code-scanned="codeScanned"
+        v-on:error-captured="errorCaptured"
+        :stop-on-scanned="true"
+        :draw-on-found="true"
+        :responsive="false"
+      />
+    </div>
+  </div>
+</template>
+```
+
+
+### 父组件方法
+
+```js
+import Scaner from '../components/Scaner';
+
+export default {
+  name: 'Scan',
+  components: {
+    Scaner
+  },
+  data () {
+    return {
+      errorMessage: "",
+      scanned: ""
+    }
+  },
+  methods: {
+    codeScanned(code) {
+      this.scanned = code;
+      setTimeout(() => {
+        alert(`扫码解析成功: ${code}`);
+      }, 200)
+    },
+    errorCaptured(error) {
+      switch (error.name) {
+        case "NotAllowedError":
+          this.errorMessage = "Camera permission denied.";
+          break;
+        case "NotFoundError":
+          this.errorMessage = "There is no connected camera.";
+          break;
+        case "NotSupportedError":
+          this.errorMessage =
+            "Seems like this page is served in non-secure context.";
+          break;
+        case "NotReadableError":
+          this.errorMessage =
+            "Couldn't access your camera. Is it already in use?";
+          break;
+        case "OverconstrainedError":
+          this.errorMessage = "Constraints don't match any installed camera.";
+          break;
+        default:
+          this.errorMessage = "UNKNOWN ERROR: " + error.message;
+      }
+      console.error(this.errorMessage);
+     alert('相机调用失败');
+    }
+  },
+  mounted () {
+    var str = navigator.userAgent.toLowerCase(); 
+    var ver = str.match(/cpu iphone os (.*?) like mac os/);
+    if (ver && ver[1].replace(/_/g,".") < '10.3.3') {
+     alert('相机调用失败');
+    }
+  }
+```
+
+### 完整代码
+
+> https://github.com/dragonir/h5-scan-qrcode
+
 
 ## 总结
 
@@ -98,7 +371,7 @@ if (code) {
 * 低版本浏览器（如 iOS 10.3以下）、Android小众浏览器（如 IQOO自带浏览器）不兼容
 * QQ、微信内置浏览器无法调用
 
-![caniuse](http://127.0.0.1:8080/images/caniuse.png)
+![caniuse](./images/caniuse.png)
 
 ### 推荐阅读
 
