@@ -1,9 +1,8 @@
 <template>
   <div class="scaner" ref="scaner">
     <div class="banner" v-if="showBanner">
-      <i class="hint_icon">!</i>
-      <i class="close_icon" @click="() => showBanner = false">x</i>
-      <p class="text">如果当前浏览器无法扫码，请使用其他浏览器登录后重试。</p>
+      <i class="close_icon" @click="() => showBanner = false"></i>
+      <p class="text">若当前浏览器无法扫码，请切换其他浏览器尝试</p>
     </div>
     <div class="cover">
       <p class="line"></p>
@@ -231,39 +230,32 @@ export default {
   height: calc(100% - 48px);
 }
 .scaner .banner {
-  height: 64px;
   width: 340px;
   position: absolute;
   top: 16px;
   left: 50%;
   margin-left: -170px;
-  background: #888888;
-  border-radius: 2px;
+  background: #FA74A2;
+  border-radius: 8px;
   box-sizing: border-box;
-  padding: 14px 34px 14px 64px;
-  opacity: 0.8;
+  padding: 12px;
+  opacity: 0.9;
   box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
 }
 .scaner .banner .text {
+  padding: 0;
+  margin: 0;
   color: #FFFFFF;
   font-size: 12px;
   text-align: justify;
   text-align-last: left;
-  line-height: 1.5;
-  text-shadow: 1px 0 1px rgba(0, 0, 0, 0.2);
-}
-.scaner .banner .hint_icon {
-  display: inline-block;
-  height: 24px;
-  width: 24px;
-  position: absolute;
-  left: 20px;
-  top: 18px;
 }
 .scaner .banner .close_icon {
   display: inline-block;
-  height: 10px;
-  width: 10px;
+  height: 24px;
+  width: 24px;
+  background: url('../assets/close.png') no-repeat center;
+  background-size: auto 100%;
   position: absolute;
   right: 8px;
   top: 8px;
@@ -286,8 +278,8 @@ export default {
   width: 200px;
   height: 1px;
   margin-left: 10px;
-  background: #1089FF;
-  background: linear-gradient(to right, transparent, #40A9FF, #0165FF, #40A9FF, transparent);
+  background: #5F68E8;
+  background: linear-gradient(to right, transparent, #5F68E8, #0165FF, #5F68E8, transparent);
   position: absolute;
   -webkit-animation: scan 1.75s infinite linear;
   -moz-animation: scan 1.75s infinite linear;
@@ -309,19 +301,19 @@ export default {
 }
 .scaner .cover .square.top {
   top: 0;
-  border-top: 1px solid #1089FF;
+  border-top: 1px solid #5F68E8;
 }
 .scaner .cover .square.left {
   left: 0;
-  border-left: 1px solid #1089FF;
+  border-left: 1px solid #5F68E8;
 }
 .scaner .cover .square.bottom {
   bottom: 0;
-  border-bottom: 1px solid #1089FF;
+  border-bottom: 1px solid #5F68E8;
 }
 .scaner .cover .square.right {
  right: 0;
-  border-right: 1px solid #1089FF;
+  border-right: 1px solid #5F68E8;
 }
 .scaner .cover .tips {
   position: absolute;
@@ -336,27 +328,27 @@ export default {
   25% {top: 50px}
   50% {top: 100px}
   75% {top: 150px}
-  100% {top: 220px}
+  100% {top: 200px}
 }
 @-moz-keyframes scan {
   0% {top: 0}
   25% {top: 50px}
   50% {top: 100px}
   75% {top: 150px}
-  100% {top: 220px}
+  100% {top: 200px}
 }
 @-o-keyframes scan {
   0% {top: 0}
   25% {top: 50px}
   50% {top: 100px}
   75% {top: 150px}
-  100% {top: 220px}
+  100% {top: 200px}
 }
 @keyframes scan {
   0% {top: 0}
   25% {top: 50px}
   50% {top: 100px}
   75% {top: 150px}
-  100% {top: 220px}
+  100% {top: 200px}
 }
 </style>

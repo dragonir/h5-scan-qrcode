@@ -1,8 +1,8 @@
 <template>
-  <div class="join-panel join_by_scan">
+  <div class="scan">
     <div class="nav">
-      <a class="_close" @click="() => $router.go(-1)"></a>
-      <p class="_title">扫一扫</p>
+      <a class="close" @click="() => $router.go(-1)"></a>
+      <p class="title">Scan QRcode</p>
     </div>
     <div class="scroll-container">
       <Scaner
@@ -21,7 +21,7 @@
 import Scaner from '../components/Scaner';
 
 export default {
-  name: 'joinByScan',
+  name: 'Scan',
   components: {
     Scaner
   },
@@ -59,22 +59,46 @@ export default {
           this.errorMessage = "UNKNOWN ERROR: " + error.message;
       }
       console.error(this.errorMessage);
-     alert('相机调用失败，请切换其他浏览器或使用企业码加入云盘');
+     alert('相机调用失败');
     }
   },
   mounted () {
     var str = navigator.userAgent.toLowerCase(); 
     var ver = str.match(/cpu iphone os (.*?) like mac os/);
     if (ver && ver[1].replace(/_/g,".") < '10.3.3') {
-     alert('相机调用失败，请切换其他浏览器或使用企业码加入云盘');
+     alert('相机调用失败');
     }
   }
 }
 </script>
 
 <style lang="css" scoped>
-.join_by_scan {
+.scan {
   height: 100%;
   width: 100%;
+}
+.scan .nav {
+  width: 100%;
+  height: 48px;
+  line-height: 48px;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+.scan .nav .title {
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  color: #FFFFFF;
+}
+.scan .nav .close {
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+  background: url('../assets/back.png') no-repeat center;
+  background-size: auto 100%;
+  position: absolute;
+  left: 16px;
+  top: 14px;
 }
 </style>

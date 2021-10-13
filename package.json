@@ -2,18 +2,21 @@
   "name": "h5-scan-qrcode",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://dragonir.github.io/h5-scan-qrcode",
   "scripts": {
     "start": "vue-cli-service serve",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "jsqr": "^1.4.0",
     "vue": "^2.6.11",
     "vue-router": "^3.5.2",
-    "jsqr": "1.4.0",
-    "webrtc-adapter": "8.1.0"
+    "webrtc-adapter": "^8.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -22,6 +25,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "gh-pages": "^3.2.3",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
@@ -38,6 +42,8 @@
     },
     "rules": {}
   },
+  "author": "wangbin",
+  "license": "ISC",
   "browserslist": [
     "> 1%",
     "last 2 versions",

@@ -4,13 +4,49 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="keywords" content="前端实现H5浏览器扫码功能,📷,📸,🎥,📹">
+    <meta name="description" content="前端实现H5浏览器扫码功能,📷,📸,🎥,📹">
+    <meta name="apple-mobile-web-app-capable" content="yes"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="shortcut icon" href="<%= BASE_URL %>favicon.png">
+    <link rel="apple-touch-icon" href="<%= BASE_URL %>favicon.png"/>
+    <link rel="apple-touch-icon-precomposed" href="<%= BASE_URL %>favicon.png">
+    <link rel="Bookmark" href="<%= BASE_URL %>favicon.png" />
+    <style>
+    html, body {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      background: #5F68E8;
+      overflow: hidden;
+    }
+    .mod_orient_layer {
+      display: none;
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1111;
+      background: #5F68E8 url('<%= BASE_URL %>landscape.png') no-repeat center;
+      background-size: contain;
+    }
+    @media screen and (min-aspect-ratio: 13/9) {
+      .mod_orient_layer {
+        display: block;
+      }
+    }
+    </style>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <div class="mod_orient_layer"></div>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
