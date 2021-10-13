@@ -47,12 +47,11 @@ export default {
 .tips .tips_title {
   font-size: 32px;
   font-weight: bold;
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, .15), 0px 1px 4px rgba(0, 0, 0, .15);
+  text-shadow: 0px 1px 1px rgba(0, 0, 0, .15);
 }
 .tips .tips_descript {
   font-size: 20px;
   padding-top: 12px;
-  text-shadow: 0px 1px 1px rgba(0, 0, 0, .15);
 }
 .button {
   height: 56px;

@@ -34,7 +34,9 @@ export default {
   methods: {
     codeScanned(code) {
       this.scanned = code;
-      window.open(code, '_blank');
+      setTimeout(() => {
+        alert(`扫码解析成功: ${code}`);
+      }, 200)
     },
     errorCaptured(error) {
       switch (error.name) {
